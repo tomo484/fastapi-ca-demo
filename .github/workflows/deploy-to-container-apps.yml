@@ -1,0 +1,102 @@
+name: Deploy to Container Apps
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  ACR_NAME: acrfastapicademo
+  RESOURCE_GROUP: rg-fastapi-ca-demo
+  CONTAINER_APP_NAME: ca-fastapi-demo
+  IMAGE_NAME: fastapi-demo
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: Log in to ACR
+      run: |
+        az acr login --name ${{ env.ACR_NAME }}
+        
+    - name: Build and push Docker image
+      run: |
+        IMAGE_TAG="${{ github.sha }}"
+        IMAGE_FULL_NAME="${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+        
+        docker build -t $IMAGE_FULL_NAME .
+        docker push $IMAGE_FULL_NAME
+        
+        echo "IMAGE_FULL_NAME=$IMAGE_FULL_NAME" >> $GITHUB_ENV
+        
+    - name: Deploy to Container Apps
+      uses: azure/container-apps-deploy-action@v2
+      with:
+        containerAppName: ${{ env.CONTAINER_APP_NAME }}
+        resourceGroup: ${{ env.RESOURCE_GROUP }}
+        imageToDeploy: ${{ env.IMAGE_FULL_NAME }}
+        
+    - name: Verify deployment
+      run: |
+        # アプリケーションURLを取得
+        APP_URL=$(az containerapp show \
+          --name ${{ env.CONTAINER_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --query properties.configuration.ingress.fqdn \
+          --output tsv)
+        
+        echo "Application URL: https://$APP_URL"
+        
+        # ヘルスチェック
+        curl -f https://$APP_URL/health || exit 1
+        
+    - name: Run Docker security scan
+      uses: docker/scout-action@v1
+      with:
+        command: cves
+        image: ${{ env.IMAGE_FULL_NAME }}
+        sarif-file: docker-scout-results.sarif
+        
+    - name: Upload SARIF results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: docker-scout-results.sarif
+
+    - name: Update Container App with environment variables
+      run: |
+        az containerapp update \
+          --name ${{ env.CONTAINER_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --set-env-vars "ENVIRONMENT=production" "BUILD_VERSION=${{ github.sha }}"
+    
+    - name: Deploy with traffic splitting
+      run: |
+        az containerapp update \
+          --name ${{ env.CONTAINER_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --image ${{ env.IMAGE_FULL_NAME }} \
+          --revision-suffix ${{ github.sha }}
+        
+        sleep 30
+        NEW_REVISION=$(az containerapp revision list \
+          --name ${{ env.CONTAINER_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --query "[0].name" --output tsv)
+        
+        az containerapp ingress traffic set \
+          --name ${{ env.CONTAINER_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --traffic-weight $NEW_REVISION=100
