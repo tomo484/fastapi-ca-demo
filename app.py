@@ -5,7 +5,7 @@ from datetime import datetime
 
 # FastAPI アプリケーションの初期化
 app = FastAPI(
-    title="FastAPI Container Apps Demo",
+    title="FastAPI Container Apps Demodだぞ！",
     description="Azure Container Apps での FastAPI デモアプリケーション",
     version="1.0.0"
 )
