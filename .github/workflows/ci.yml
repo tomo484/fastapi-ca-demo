@@ -29,8 +29,10 @@ jobs:
       
     - name: Install Node dependencies
       working-directory: ./nextjs-app
-      run: npm install
-      
+      run: 
+        npm install -g pnpm
+        pnpm install
+        
     - name: Test FastAPI
       run: |
         cd fastapi-app
@@ -38,7 +40,7 @@ jobs:
         
     - name: Test Next.js
       working-directory: ./nextjs-app
-      run: npm run build
+      run: pnpm run build
       
     - name: Docker build test
       run: docker compose build
