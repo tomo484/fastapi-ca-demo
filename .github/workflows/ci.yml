@@ -36,7 +36,7 @@ jobs:
     - name: Test FastAPI
       run: |
         cd fastapi-app
-        python -m pytest --disable-warnings || echo "No tests yet"
+        python -m pytest --disable-warnings 
         
     - name: Test Next.js
       working-directory: ./nextjs-app
