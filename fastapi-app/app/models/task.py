@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from api.db import Base
+from app.db import Base
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -16,4 +16,4 @@ class Done(Base):
 
     id = Column(Integer, ForeignKey("tasks.id"), primary_key=True)
 
-    task = relationship("task", back_populates="done")
+    task = relationship("Task", back_populates="done")
