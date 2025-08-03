@@ -1,0 +1,73 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  ACR_NAME: acrfastapicademo
+  RESOURCE_GROUP: rg-fastapi-ca-demo
+  FASTAPI_APP_NAME: ca-fastapi-demo
+  NEXTJS_APP_NAME: ca-nextjs-demo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: Login to ACR
+      run: az acr login --name ${{ env.ACR_NAME }}
+      
+    - name: Build and push FastAPI
+      run: |
+        IMAGE_TAG="main-${{ github.sha }}"
+        az acr build --registry ${{ env.ACR_NAME }} \
+          --image fastapi:$IMAGE_TAG \
+          --file fastapi-app/Dockerfile .
+          
+    - name: Build and push Next.js
+      run: |
+        IMAGE_TAG="main-${{ github.sha }}"
+        az acr build --registry ${{ env.ACR_NAME }} \
+          --image nextjs:$IMAGE_TAG \
+          --file nextjs-app/Dockerfile ./nextjs-app
+          
+    - name: Deploy FastAPI to Container Apps
+      run: |
+        IMAGE_TAG="main-${{ github.sha }}"
+        az containerapp update \
+          --name ${{ env.FASTAPI_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --image ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG
+          
+    - name: Deploy Next.js to Container Apps
+      run: |
+        IMAGE_TAG="main-${{ github.sha }}"
+        az containerapp update \
+          --name ${{ env.NEXTJS_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --image ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG
+          
+    - name: Verify deployment
+      run: |
+        echo "Waiting for deployment to complete..."
+        sleep 60
+        
+        # FastAPI health check
+        FASTAPI_URL=$(az containerapp show --name ${{ env.FASTAPI_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+        curl -f https://$FASTAPI_URL/docs || echo "FastAPI health check failed"
+        
+        # Next.js health check
+        NEXTJS_URL=$(az containerapp show --name ${{ env.NEXTJS_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+        curl -f https://$NEXTJS_URL || echo "Next.js health check failed"
+        
+        echo "FastAPI URL: https://$FASTAPI_URL"
+        echo "Next.js URL: https://$NEXTJS_URL"
