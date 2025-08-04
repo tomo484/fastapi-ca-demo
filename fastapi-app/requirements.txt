@@ -5,4 +5,5 @@ pydantic==2.5.0
 pytest==7.4.3
 httpx==0.25.2
 sqlalchemy==2.0.23
-aiomysql==0.2.0
+asyncpg==0.29.0           # PostgreSQL非同期ドライバ
+psycopg2-binary==2.9.9    # PostgreSQL同期ドライバ

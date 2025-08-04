@@ -17,11 +17,8 @@ RUN pnpm install
 # アプリケーションコードをコピー
 COPY . .
 
-# Next.jsアプリケーションをビルド
-RUN pnpm build
-
 # ポート3000を公開
 EXPOSE 3000
 
-# アプリケーションを起動
-CMD ["pnpm", "start"]
+# 開発モードでアプリケーションを起動
+CMD ["pnpm", "dev"]
