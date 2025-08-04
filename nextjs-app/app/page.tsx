@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Container } from '@/components/layout/Container';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
@@ -149,57 +149,64 @@ export default function HomePage() {
 
       {/* メインコンテンツエリア */}
       <main>
-        <Container className="py-8">
-          {/* 新規タスク追加エリア */}
-          <section className="mb-8">
-            <Card>
-              <CardHeader>
-                <h2 className="text-lg font-semibold">
-                  {editingTask ? 'タスクを編集' : '新しいタスクを追加'}
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <TaskForm
-                  task={editingTask || undefined}
-                  onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
-                  onCancel={editingTask ? handleCancelEdit : undefined}
-                  isLoading={createTask.isPending || updateTask.isPending}
-                />
-              </CardContent>
-            </Card>
-          </section>
+        <Container className="py-4 sm:py-6 lg:py-8">
+          <div className="space-y-6 lg:space-y-8">
+            {/* 新規タスク追加エリア */}
+            <section>
+              <Card className="transition-all duration-200 hover:shadow-lg">
+                <CardHeader className="pb-4">
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground">
+                    {editingTask ? 'タスクを編集' : '新しいタスクを追加'}
+                  </h2>
+                </CardHeader>
+                <CardContent>
+                  <TaskForm
+                    task={editingTask || undefined}
+                    onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
+                    onCancel={editingTask ? handleCancelEdit : undefined}
+                    isLoading={createTask.isPending || updateTask.isPending}
+                  />
+                </CardContent>
+              </Card>
+            </section>
 
-          {/* フィルター・検索エリア */}
-          <section className="mb-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <h3 className="text-md font-medium">フィルター・検索</h3>
-              </CardHeader>
-              <CardContent>
-                <TaskFilters onFilterChange={handleFilterChange} />
-              </CardContent>
-            </Card>
-          </section>
+            {/* フィルター・検索エリア */}
+            <section>
+              <Card className="transition-all duration-200 hover:shadow-lg">
+                <CardHeader className="pb-3">
+                  <h3 className="text-base sm:text-lg font-medium text-foreground">フィルター・検索</h3>
+                </CardHeader>
+                <CardContent>
+                  <TaskFilters onFilterChange={handleFilterChange} />
+                </CardContent>
+              </Card>
+            </section>
 
-          {/* タスク一覧エリア */}
-          <section>
-            <Card>
-              <CardHeader>
-                <h2 className="text-lg font-semibold">
-                  タスク一覧 ({filteredTasks.length}件)
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <TaskList
-                  tasks={filteredTasks}
-                  isLoading={false}
-                  onToggleDone={handleToggleDone}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              </CardContent>
-            </Card>
-          </section>
+            {/* タスク一覧エリア */}
+            <section>
+              <Card className="transition-all duration-200 hover:shadow-lg">
+                <CardHeader className="pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <h2 className="text-lg sm:text-xl font-semibold text-foreground">
+                      タスク一覧
+                    </h2>
+                    <div className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                      {filteredTasks.length}件
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <TaskList
+                    tasks={filteredTasks}
+                    isLoading={false}
+                    onToggleDone={handleToggleDone}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                </CardContent>
+              </Card>
+            </section>
+          </div>
         </Container>
       </main>
     </div>
