@@ -3,6 +3,7 @@ name: Deploy to Azure
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:  # 手動実行を追加
 
 env:
   ACR_NAME: acrfastapicademo
@@ -26,19 +27,39 @@ jobs:
     - name: Login to ACR
       run: az acr login --name ${{ env.ACR_NAME }}
       
+    - name: Ensure Container Apps ACR Registry Configuration
+      run: |
+        # FastAPI Container App のレジストリ設定確認・設定
+        echo "Configuring FastAPI Container App registry..."
+        az containerapp registry set \
+          --name ${{ env.FASTAPI_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.ACR_NAME }}.azurecr.io \
+          --username ${{ env.ACR_NAME }} \
+          --password $(az acr credential show --name ${{ env.ACR_NAME }} --query passwords[0].value -o tsv) || echo "FastAPI registry already configured"
+        
+        # Next.js Container App のレジストリ設定確認・設定
+        echo "Configuring Next.js Container App registry..."
+        az containerapp registry set \
+          --name ${{ env.NEXTJS_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --server ${{ env.ACR_NAME }}.azurecr.io \
+          --username ${{ env.ACR_NAME }} \
+          --password $(az acr credential show --name ${{ env.ACR_NAME }} --query passwords[0].value -o tsv) || echo "Next.js registry already configured"
+      
     - name: Build and push FastAPI
       run: |
         IMAGE_TAG="main-${{ github.sha }}"
-        az acr build --registry ${{ env.ACR_NAME }} \
-          --image fastapi:$IMAGE_TAG \
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG \
           --file fastapi-app/Dockerfile .
+        docker push ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG
           
     - name: Build and push Next.js
       run: |
         IMAGE_TAG="main-${{ github.sha }}"
-        az acr build --registry ${{ env.ACR_NAME }} \
-          --image nextjs:$IMAGE_TAG \
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG \
           --file nextjs-app/Dockerfile ./nextjs-app
+        docker push ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG
           
     - name: Deploy FastAPI to Container Apps
       run: |

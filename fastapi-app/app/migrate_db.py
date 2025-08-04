@@ -1,8 +1,7 @@
 from sqlalchemy import create_engine
 
-from api.models.task import Base
-
-DB_URL = "mysql+pymysql://root@db:3306/demo?charset=utf8"
+from app.models.task import Base
+DB_URL = "postgresql://postgres:postgres@db:5432/taskdb"
 engine = create_engine(DB_URL, echo=True)
 
 def reset_database():
