@@ -51,7 +51,7 @@ jobs:
       run: |
         IMAGE_TAG="main-${{ github.sha }}"
         docker build -t ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG \
-          --file fastapi-app/Dockerfile .
+          --file fastapi-app/Dockerfile ./fastapi-app
         docker push ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG
           
     - name: Build and push Next.js
