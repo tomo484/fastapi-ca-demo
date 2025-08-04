@@ -1,15 +1,12 @@
-import React from 'react'
+/// <reference types="react" />
+/// <reference types="react-dom" />
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      [elemName: string]: any
+      [elemName: string]: any;
     }
   }
-}
-
-declare namespace React {
-  type ReactNode = import('react').ReactNode
 }
 
 export {} 

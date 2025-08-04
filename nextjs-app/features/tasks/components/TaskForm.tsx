@@ -35,18 +35,26 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="タスクのタイトルを入力してください"
-        error={error}
-      />
+      <div className="space-y-2">
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="タスクのタイトルを入力してください"
+          error={error}
+          className="transition-all duration-200 focus:scale-[1.01]"
+          disabled={isLoading}
+        />
+        <p className="text-xs text-muted-foreground">
+          {title.length}/100文字
+        </p>
+      </div>
       
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Button 
           type="submit" 
           isLoading={isLoading}
-          className="flex-1"
+          className="flex-1 transition-all duration-200"
+          disabled={!title.trim()}
         >
           {task ? '更新' : '追加'}
         </Button>
@@ -56,6 +64,8 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
             type="button" 
             variant="outline" 
             onClick={onCancel}
+            disabled={isLoading}
+            className="sm:min-w-[100px] transition-all duration-200"
           >
             キャンセル
           </Button>
