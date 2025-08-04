@@ -20,7 +20,10 @@ const nextConfig = {
   
   // 環境変数設定
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 
+      (process.env.NODE_ENV === 'production' 
+        ? 'https://ca-fastapi-demo.happystone-9a8bfb39.japaneast.azurecontainerapps.io'
+        : 'http://localhost:8000'),
   },
 }
 
