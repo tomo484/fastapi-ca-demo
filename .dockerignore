@@ -22,4 +22,16 @@ coverage.xml
 *.log
 .DS_Store
 .vscode
-.idea 
+.idea
+
+# Next.js specific
+.next
+node_modules
+.swc
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.production.local
+.env.development.local 
