@@ -58,6 +58,7 @@ jobs:
       run: |
         IMAGE_TAG="main-${{ github.sha }}"
         docker build -t ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG \
+          --build-arg NEXT_PUBLIC_API_URL=https://${{ env.FASTAPI_APP_NAME }}.happystone-9a8bfb39.japaneast.azurecontainerapps.io \
           --file nextjs-app/Dockerfile ./nextjs-app
         docker push ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG
           

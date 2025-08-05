@@ -20,6 +20,11 @@ COPY . .
 # 既存の.nextディレクトリを削除（権限問題回避）
 RUN rm -rf .next
 
+# 環境変数を設定（Build時に埋め込まれる）
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NODE_ENV=production
+
 # Next.jsアプリケーションをビルド
 RUN pnpm build
 
