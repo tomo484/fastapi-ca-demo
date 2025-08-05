@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine
+from config import settings
 
 from app.models.task import Base
-DB_URL = "postgresql://postgres:postgres@db:5432/taskdb"
+# SQLite同期接続用URL（configから取得）
+DB_URL = settings.DATABASE_URL
 engine = create_engine(DB_URL, echo=True)
 
 def reset_database():
