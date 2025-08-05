@@ -67,7 +67,8 @@ jobs:
         az containerapp update \
           --name ${{ env.FASTAPI_APP_NAME }} \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --image ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG
+          --image ${{ env.ACR_NAME }}.azurecr.io/fastapi:$IMAGE_TAG \
+          --set-env-vars CORS_ORIGINS=https://${{ env.NEXTJS_APP_NAME }}.happystone-9a8bfb39.japaneast.azurecontainerapps.io
           
     - name: Deploy Next.js to Container Apps
       run: |
@@ -75,7 +76,8 @@ jobs:
         az containerapp update \
           --name ${{ env.NEXTJS_APP_NAME }} \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --image ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG
+          --image ${{ env.ACR_NAME }}.azurecr.io/nextjs:$IMAGE_TAG \
+          --set-env-vars NEXT_PUBLIC_API_URL=https://${{ env.FASTAPI_APP_NAME }}.happystone-9a8bfb39.japaneast.azurecontainerapps.io
           
     - name: Verify deployment
       run: |

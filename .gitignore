@@ -7,3 +7,11 @@ __pycache__/
 node_modules/
 nextjs-app/node_modules/
 **/node_modules/
+
+# Next.js build output
+nextjs-app/.next/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
