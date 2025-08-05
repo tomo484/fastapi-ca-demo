@@ -11,6 +11,6 @@ class Settings:
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
     # CORS設定
-    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://ca-nextjs-demo.happystone-9a8bfb39.japaneast.azurecontainerapps.io").split(",")
     
 settings = Settings()

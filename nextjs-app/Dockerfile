@@ -17,8 +17,14 @@ RUN pnpm install
 # アプリケーションコードをコピー
 COPY . .
 
+# 既存の.nextディレクトリを削除（権限問題回避）
+RUN rm -rf .next
+
+# Next.jsアプリケーションをビルド
+RUN pnpm build
+
 # ポート3000を公開
 EXPOSE 3000
 
-# 開発モードでアプリケーションを起動
-CMD ["pnpm", "dev"]
+# 本番モードでアプリケーションを起動
+CMD ["pnpm", "start"]
