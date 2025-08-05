@@ -4,7 +4,7 @@ from typing import List
 
 class Settings:
     # データベース設定
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@db:5432/taskdb")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./taskdb.db")
     
     # アプリケーション設定
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"

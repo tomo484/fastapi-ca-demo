@@ -24,11 +24,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
+
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/taskdb
+      - DATABASE_URL=sqlite:///./taskdb.db
       - PYTHONPATH=/app
       - DEBUG=false
       - LOG_LEVEL=INFO
