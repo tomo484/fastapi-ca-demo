@@ -15,3 +15,26 @@ out/
 build/
 dist/
 *.tsbuildinfo
+
+# Python cache and test cache
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+
+# SWC cache (Next.js)
+.swc/
+**/.swc/
+
+# Documentation (generated)
+docs/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+.DS_Store
+.DS_Store?
